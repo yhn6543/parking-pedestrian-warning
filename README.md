@@ -121,13 +121,13 @@ requirements-dev.txt           테스트 의존성
 
 ## 데이터와 라이선스
 
-| 데이터셋 | 확인된 export 출처 | 메타데이터 라이선스와 주의사항 |
+| 데이터셋 | 확인된 export 출처 | 
 |---|---|---|
-| cctv-naxyo v2 | [Roboflow Universe dataset/2](https://universe.roboflow.com/dataset-uutxr/cctv-naxyo/dataset/2) | CC BY 4.0 |
-| PersonNormal v1 | [Roboflow Universe dataset/1](https://universe.roboflow.com/disertation-project/personnormal/dataset/1) | Public Domain |
-| CityPersons conversion v9 | [Roboflow Universe dataset/9](https://universe.roboflow.com/citypersons-conversion/citypersons-woqjq/dataset/9) | 변환 프로젝트는 CC BY 4.0으로 표기돼 있지만, 원본 Cityscapes는 비상업적 사용만 허용하고 데이터 및 수정본 재배포를 금지합니다. [Cityscapes 원본 이용 조건](https://www.cityscapes-dataset.com/license/)이 우선 적용됩니다. |
-| People Detection v11 RF-DETR Medium | [Roboflow Universe dataset/11](https://universe.roboflow.com/leo-ueno/people-detection-o4rdr/dataset/11) | `README.dataset.txt`에는 라이선스가 `undefined`, export `data.yaml`에는 `Private`로 기록돼 있어 프로젝트 수준의 명확한 공개 라이선스를 확인하지 못했습니다. |
-| Person detection v15 | [Roboflow Universe dataset/15](https://universe.roboflow.com/titulacin/person-detection-9a6mk/dataset/15) | export 메타데이터는 CC BY 4.0으로 표기합니다. 다만 설명에 Unsplash와 Google Images에서 가져온 이미지가 포함되고 제공자가 대부분의 이미지를 소유하지 않는다고 명시돼 있어 원본 이미지 권리는 불확실합니다. |
+| cctv-naxyo v2 | [Roboflow Universe dataset/2](https://universe.roboflow.com/dataset-uutxr/cctv-naxyo/dataset/2) |
+| PersonNormal v1 | [Roboflow Universe dataset/1](https://universe.roboflow.com/disertation-project/personnormal/dataset/1) |
+| CityPersons conversion v9 | [Roboflow Universe dataset/9](https://universe.roboflow.com/citypersons-conversion/citypersons-woqjq/dataset/9) |
+| People Detection v11 RF-DETR Medium | [Roboflow Universe dataset/11](https://universe.roboflow.com/leo-ueno/people-detection-o4rdr/dataset/11) |
+| Person detection v15 | [Roboflow Universe dataset/15](https://universe.roboflow.com/titulacin/person-detection-9a6mk/dataset/15) | 
 
 
 ## 제한사항
