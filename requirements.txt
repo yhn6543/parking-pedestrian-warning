@@ -1,0 +1,9 @@
+opencv-python>=4.10,<5
+numpy>=2,<3
+ultralytics>=8.4,<9
+PyYAML>=6,<7
+streamlit>=1.40,<2
+pandas>=2.2,<4
+matplotlib>=3.8,<4
+imageio-ffmpeg>=0.5,<1
+Pillow>=10,<13

@@ -1,0 +1,14 @@
+body { margin: 0; background: #111; color: #eee; font: 14px "Segoe UI", Arial, sans-serif; }
+header, aside { padding: 10px; background: #20242a; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; }
+.viewer { padding: 10px; text-align: center; }
+canvas { max-width: 100%; max-height: calc(100vh - 80px); background: #000; cursor: crosshair; }
+button, textarea { padding: 6px; margin: 2px; font: inherit; }
+textarea { width: 100%; height: 60px; box-sizing: border-box; }
+dl { display: grid; grid-template-columns: 110px 1fr; gap: 4px; }
+dt { color: #9ecbff; }
+dd { margin: 0; word-break: break-all; }
+.drop { background: #9d3131; color: #fff; }
+.help { line-height: 1.5; color: #ccc; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; } aside { order: -1; } }

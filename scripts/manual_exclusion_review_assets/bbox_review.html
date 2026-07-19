@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>v3 BBox Review</title>
+  <link rel="stylesheet" href="bbox_review_app.css">
+</head>
+<body>
+  <header>
+    <strong>v3 Manual Exclusion + BBox Editor</strong>
+    <button id="orig">Original</button>
+    <button id="over">Overlay</button>
+    <button id="vis">BBox 표시 중 (V)</button>
+    <button id="keep">KEEP (K)</button>
+    <button id="drop" class="drop">DROP (F)</button>
+    <button id="hold">HOLD (C)</button>
+    <button id="save">BBox 저장 (S)</button>
+    <button id="reset">RESET</button>
+    <span id="pos"></span>
+  </header>
+  <main>
+    <section class="viewer"><canvas id="canvas"></canvas></section>
+    <aside>
+      <div class="controls">
+        <button id="prev">Q 이전</button>
+        <button id="next">E 다음</button>
+        <button id="add">A Add Box</button>
+        <button id="del">W Delete</button>
+      </div>
+      <p id="state"></p>
+      <textarea id="note" placeholder="선택 메모"></textarea>
+      <dl id="meta"></dl>
+      <p class="help">V 표시/숨김 · A 드래그 추가 · 클릭 선택 · Arrow 1px 이동 · Ctrl+Arrow 경계 확장 · W 삭제 · S 저장 · Ctrl+Z/Y undo/redo · Esc 취소 · K/F/C 결정 · Q/E 이동 · Space DROP 후 이동</p>
+    </aside>
+  </main>
+  <script src="bbox_review_app.js"></script>
+  <script src="bbox_review_shortcuts.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# Documentation example only. The current app receives these values through
+# the Streamlit sidebar or CLI arguments; it does not auto-load this file.
+model_weights_path: <path-to-model-weights>
+output_dir: <output-directory>
+default_camera_index: 0
+ffmpeg_path: <optional-path-to-ffmpeg>
