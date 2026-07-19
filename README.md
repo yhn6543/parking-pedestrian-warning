@@ -69,7 +69,11 @@ Fine-tuning 절대 변화:
 
 Validator가 측정한 순수 모델 inference 시간은 pretrained/fine-tuned 순으로 640에서 2.27/2.11ms, 768에서 3.16/3.01ms per image였습니다. 이는 영상 디코딩, ROI 판정, 시각화, 경고음 처리를 포함한 전체 애플리케이션 FPS가 아닙니다.
 
-COCO pretrained 모델도 일반적인 사람 탐지 능력을 보였지만 목표 CCTV 데이터에 fine-tuning한 뒤 두 해상도 모두 Recall과 mAP가 상승했습니다. 이 프로젝트에서는 위험 보행자를 놓치지 않는 것이 중요하므로 Recall을 우선 확인합니다. 다만 이는 동일 validation set의 비교이며 새로운 환경에서의 최종 일반화 성능을 보장하지 않습니다.
+COCO pretrained 모델도 일반적인 사람 탐지 능력을 보였지만 목표 CCTV 데이터에 fine-tuning한 뒤 두 해상도 모두 Recall과 mAP가 상승했습니다. 이 프로젝트에서는 위험 보행자를 놓치지 않는 것이 중요하므로 Recall을 우선 확인합니다.
+
+`mAP50`은 예측 박스와 정답 박스의 IoU가 0.50 이상인 조건에서 탐지 성능을 평가합니다. `mAP50-95`는 IoU 0.50부터 0.95까지 0.05 간격의 여러 기준에서 AP를 평균하므로 박스의 위치와 크기가 정답에 얼마나 정확히 맞는지를 더 엄격하게 반영합니다. 따라서 mAP50보다 mAP50-95가 낮은 것은 탐지 여부뿐 아니라 정밀한 위치 추정이 더 어려운 문제임을 보여 줍니다.
+
+Fine-tuning으로 전반적인 성능이 개선됐지만 소형·원거리·가림·밀집 보행자에서는 여전히 개선 여지가 있습니다. 다음 단계는 야간·역광·우천·가림 조건의 데이터를 보강하고, 현재 학습·validation 구성과 분리된 외부 검증 세트를 구축하는 것입니다. 현재 수치는 동일 validation set의 비교 결과이며 새로운 환경의 일반화 성능이나 최종 배포 성능을 보장하지 않습니다.
 
 ## 설치와 실행
 
@@ -97,14 +101,15 @@ models/fine_tuned/parking_yolo26n_person_only_best.pt
 
 이번 작업 기준 원본 확장 테스트는 `342 passed`, 공개 패키지 테스트는 `204 passed`입니다. 테스트는 실제 카메라, 장시간 학습, test set 평가를 실행하지 않습니다.
 
-## 문제 해결 사례
+## 데이터 품질 관리와 검증
 
-- 대량 validation 추론을 batch 단위로 실행해 GPU 활용과 메모리 사용을 관리했습니다.
-- FN, FP, duplicate prediction, localization mismatch를 분리해 데이터와 모델 오류를 구분했습니다.
-- BBox 수정은 원본 YOLO label 대신 별도 SQLite에 revision과 함께 저장했습니다.
-- 데이터셋 생성은 dry-run과 apply를 분리하고 HOLD, 해시 불일치, 중복 ID를 차단했습니다.
-- OpenCV MP4가 브라우저에서 재생되지 않는 경우 H.264/AAC 변환과 원본 다운로드 fallback을 제공합니다.
-- Streamlit의 반복 실행에서도 입력별 ROI 경로와 상태를 보존하도록 상태 전이를 분리했습니다.
+- 원천 데이터의 `Person`, `Persona`, `ped` 등 보행자 클래스를 단일 `person` 클래스로 통합했습니다.
+- 모든 이미지/라벨 쌍의 존재 여부와 YOLO 정규화 좌표 범위, 박스 유효성을 검증했습니다.
+- 군중 밀도가 높거나 사람이 매우 작게 보이는 이미지, 목표 CCTV 도메인에 부적합한 후보를 별도 추출해 수동 검수했습니다.
+- 수동 검수 결정은 `KEEP`, `DROP`, `HOLD`로 구분해 보류 항목이 자동 반영되지 않도록 했습니다.
+- BBox 수정은 원본 YOLO label을 직접 덮어쓰지 않고 revision 정보와 함께 별도 SQLite에 저장했습니다.
+- 원본 데이터·라벨·검수 결정을 보호하고, 데이터셋 생성은 dry-run과 apply 단계를 분리했습니다.
+- Validation 예측 오류를 FN, FP, localization mismatch로 분류해 미탐·오탐·위치 부정확 문제를 구분했습니다.
 
 ## 프로젝트 구조
 
@@ -123,15 +128,22 @@ requirements-dev.txt           테스트 의존성
 
 ## 데이터와 라이선스
 
-학습 데이터는 CityPersons 계열, 직접 수집·검수한 CCTV 자료, 기타 보행자 자료를 조합해 사용했습니다. 원본 데이터와 파생 데이터는 저장소에 포함하지 않습니다. CityPersons/Cityscapes 계열은 비상업 목적 및 재배포 제한이 있고, 일부 내부 소스는 권리 확인이 끝나지 않았습니다.
+데이터 준비 과정에서 사용한 로컬 export 메타데이터(`README.roboflow.txt`, `README.dataset.txt`, `data.yaml`)를 기준으로 출처와 버전을 다시 확인했습니다.
+
+| 데이터셋 | 확인된 export 출처 | 메타데이터 라이선스와 주의사항 |
+|---|---|---|
+| cctv-naxyo v2 | [Roboflow Universe dataset/2](https://universe.roboflow.com/dataset-uutxr/cctv-naxyo/dataset/2) | CC BY 4.0 |
+| PersonNormal v1 | [Roboflow Universe dataset/1](https://universe.roboflow.com/disertation-project/personnormal/dataset/1) | Public Domain |
+| CityPersons conversion v9 | [Roboflow Universe dataset/9](https://universe.roboflow.com/citypersons-conversion/citypersons-woqjq/dataset/9) | 변환 프로젝트는 CC BY 4.0으로 표기돼 있지만, 원본 Cityscapes는 비상업적 사용만 허용하고 데이터 및 수정본 재배포를 금지합니다. [Cityscapes 원본 이용 조건](https://www.cityscapes-dataset.com/license/)이 우선 적용됩니다. |
+| People Detection v11 RF-DETR Medium | [Roboflow Universe dataset/11](https://universe.roboflow.com/leo-ueno/people-detection-o4rdr/dataset/11) | `README.dataset.txt`에는 라이선스가 `undefined`, export `data.yaml`에는 `Private`로 기록돼 있어 프로젝트 수준의 명확한 공개 라이선스를 확인하지 못했습니다. |
+| Person detection v15 | [Roboflow Universe dataset/15](https://universe.roboflow.com/titulacin/person-detection-9a6mk/dataset/15) | export 메타데이터는 CC BY 4.0으로 표기합니다. 다만 설명에 Unsplash와 Google Images에서 가져온 이미지가 포함되고 제공자가 대부분의 이미지를 소유하지 않는다고 명시돼 있어 원본 이미지 권리는 불확실합니다. |
+
+저장소에는 원본·가공 데이터, label, validation raw run과 학습 weight를 포함하지 않습니다. 위 표의 라이선스 표기는 각 export 메타데이터를 기록한 것이며, 원본 이미지의 권리나 모든 사용 목적에 대한 허가를 대신하지 않습니다.
 
 이 프로젝트는 Ultralytics를 사용합니다. Ultralytics는 AGPL-3.0과 Enterprise 라이선스 선택지를 제공하므로 배포 목적에 맞는 검토가 필요합니다. 프로젝트 자체 라이선스도 아직 확정하지 않았으며 자세한 상태는 `LICENSE_PENDING.md`에 기록했습니다.
 
 ## 제한사항
 
 - 주차장 CCTV 환경을 중심으로 개발했으며 모든 카메라 각도·날씨·조명에서의 성능을 보장하지 않습니다.
-- ROI 밖의 보행자는 위험으로 판정하지 않습니다.
-- person-only 모델은 차량을 탐지하지 않습니다.
 - 노면 투사 장치 연동은 현재 mock dispatch까지만 구현했습니다.
-- 공개 패키지만으로 동일 모델을 재현할 수 없으며 데이터와 weight를 별도로 준비해야 합니다.
-- 실제 배포 전 개인정보, 촬영 동의, 데이터·모델 라이선스와 오탐/미탐 대응을 추가 검토해야 합니다.
+- 자전거·오토바이 탑승자를 `person`으로 감지해 경고할 수 있습니다.
