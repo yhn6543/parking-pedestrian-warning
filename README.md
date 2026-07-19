@@ -22,7 +22,7 @@
 
 > 이미지를 클릭하면 경고음이 포함된 전체 시연 영상을 볼 수 있습니다. 영상은 Fine-tuned YOLO26n, 실제 ROI 판정, temporal filter와 cooldown 경고 로직을 사용합니다.
 
-시연의 두 프로젝터는 영역이 아닌 점 좌표로 설정돼 있습니다. 위험 보행자의 bbox bottom-center와 가장 가까운 활성 장치를 선택하며, 영상은 선택된 실제 장치 마커와 선택 이유를 표시합니다. 외부 장치 전송은 안전한 mock dispatch입니다.
+시연의 두 프로젝터는 영역이 아닌 점 좌표로 설정돼 있습니다. 위험 보행자의 bbox bottom-center와 가장 가까운 활성 장치를 선택하며, 영상은 선택된 실제 장치 마커와 선택 이유를 표시합니다. 외부 장치 전송은 현재 mock dispatch입니다.
 
 ## 기술 스택
 
@@ -33,7 +33,6 @@
 - Streamlit
 - pytest
 
-PyTorch CUDA wheel은 운영체제와 CUDA 환경에 따라 설치 방법이 다르므로 [PyTorch 공식 설치 선택기](https://pytorch.org/get-started/locally/)를 사용합니다.
 
 ## 시스템 흐름
 
@@ -52,8 +51,6 @@ temporal filter로 순간 오탐 억제
 ROI는 선택 화면의 원본 이미지 좌표계로 저장합니다. 분석 프레임을 resize할 때 ROI도 같은 비율로 변환해 탐지 좌표와 일치시킵니다.
 
 ## Validation 성능 비교
-
-네 결과를 Ultralytics 8.4.81, 동일 GPU, 동일 validation 960장(GT 4,538개)에서 `classes=[0]`, batch 16, workers 2 조건으로 다시 평가했습니다. pretrained 모델과 데이터셋의 class 0이 모두 `person`임을 확인했으며 **test split은 평가하지 않았습니다.**
 
 | 모델 | 학습 상태 | 입력 크기 | Precision | Recall | mAP50 | mAP50-95 |
 |---|---|---:|---:|---:|---:|---:|
@@ -99,14 +96,11 @@ models/fine_tuned/parking_yolo26n_person_only_best.pt
 .\.venv\Scripts\python.exe -m pytest tests -v
 ```
 
-이번 작업 기준 원본 확장 테스트는 `342 passed`, 공개 패키지 테스트는 `204 passed`입니다. 테스트는 실제 카메라, 장시간 학습, test set 평가를 실행하지 않습니다.
-
 ## 데이터 품질 관리와 검증
 
 - 원천 데이터의 `Person`, `Persona`, `ped` 등 보행자 클래스를 단일 `person` 클래스로 통합했습니다.
 - 모든 이미지/라벨 쌍의 존재 여부와 YOLO 정규화 좌표 범위, 박스 유효성을 검증했습니다.
 - 군중 밀도가 높거나 사람이 매우 작게 보이는 이미지, 목표 CCTV 도메인에 부적합한 후보를 별도 추출해 수동 검수했습니다.
-- 수동 검수 결정은 `KEEP`, `DROP`, `HOLD`로 구분해 보류 항목이 자동 반영되지 않도록 했습니다.
 - BBox 수정은 원본 YOLO label을 직접 덮어쓰지 않고 revision 정보와 함께 별도 SQLite에 저장했습니다.
 - 원본 데이터·라벨·검수 결정을 보호하고, 데이터셋 생성은 dry-run과 apply 단계를 분리했습니다.
 - Validation 예측 오류를 FN, FP, localization mismatch로 분류해 미탐·오탐·위치 부정확 문제를 구분했습니다.
@@ -124,11 +118,8 @@ requirements.txt               실행 의존성
 requirements-dev.txt           테스트 의존성
 ```
 
-데이터, weight, validation raw run, 검수 DB와 개인 환경 파일은 공개 패키지에서 제외합니다.
 
 ## 데이터와 라이선스
-
-데이터 준비 과정에서 사용한 로컬 export 메타데이터(`README.roboflow.txt`, `README.dataset.txt`, `data.yaml`)를 기준으로 출처와 버전을 다시 확인했습니다.
 
 | 데이터셋 | 확인된 export 출처 | 메타데이터 라이선스와 주의사항 |
 |---|---|---|
@@ -138,9 +129,6 @@ requirements-dev.txt           테스트 의존성
 | People Detection v11 RF-DETR Medium | [Roboflow Universe dataset/11](https://universe.roboflow.com/leo-ueno/people-detection-o4rdr/dataset/11) | `README.dataset.txt`에는 라이선스가 `undefined`, export `data.yaml`에는 `Private`로 기록돼 있어 프로젝트 수준의 명확한 공개 라이선스를 확인하지 못했습니다. |
 | Person detection v15 | [Roboflow Universe dataset/15](https://universe.roboflow.com/titulacin/person-detection-9a6mk/dataset/15) | export 메타데이터는 CC BY 4.0으로 표기합니다. 다만 설명에 Unsplash와 Google Images에서 가져온 이미지가 포함되고 제공자가 대부분의 이미지를 소유하지 않는다고 명시돼 있어 원본 이미지 권리는 불확실합니다. |
 
-저장소에는 원본·가공 데이터, label, validation raw run과 학습 weight를 포함하지 않습니다. 위 표의 라이선스 표기는 각 export 메타데이터를 기록한 것이며, 원본 이미지의 권리나 모든 사용 목적에 대한 허가를 대신하지 않습니다.
-
-이 프로젝트는 Ultralytics를 사용합니다. Ultralytics는 AGPL-3.0과 Enterprise 라이선스 선택지를 제공하므로 배포 목적에 맞는 검토가 필요합니다. 프로젝트 자체 라이선스도 아직 확정하지 않았으며 자세한 상태는 `LICENSE_PENDING.md`에 기록했습니다.
 
 ## 제한사항
 
