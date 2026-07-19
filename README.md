@@ -122,7 +122,7 @@ requirements-dev.txt           테스트 의존성
 ## 데이터와 라이선스
 
 | 데이터셋 | 확인된 export 출처 | 
-|---|---|---|
+|---|---|
 | cctv-naxyo v2 | [Roboflow Universe dataset/2](https://universe.roboflow.com/dataset-uutxr/cctv-naxyo/dataset/2) |
 | PersonNormal v1 | [Roboflow Universe dataset/1](https://universe.roboflow.com/disertation-project/personnormal/dataset/1) |
 | CityPersons conversion v9 | [Roboflow Universe dataset/9](https://universe.roboflow.com/citypersons-conversion/citypersons-woqjq/dataset/9) |
