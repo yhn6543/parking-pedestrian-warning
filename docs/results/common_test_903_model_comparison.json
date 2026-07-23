@@ -1,0 +1,53 @@
+{
+  "status": "success",
+  "dataset": "v4 common test split",
+  "conditions": {
+    "split": "test",
+    "test_images": 903,
+    "gt_instances": 3895,
+    "class": "person",
+    "imgsz": 768,
+    "batch": 16,
+    "device": "CUDA GPU",
+    "workers": 2,
+    "conf": 0.001,
+    "iou": 0.7,
+    "max_det": 300,
+    "augment": false,
+    "plots": false,
+    "save_json": false,
+    "training_executed": false
+  },
+  "models": [
+    {
+      "model": "YOLO26n Pretrained",
+      "training_data": "COCO pretrained",
+      "precision": 0.7446422625,
+      "recall": 0.4605905006,
+      "map50": 0.5364441151,
+      "map50_95": 0.2780811437
+    },
+    {
+      "model": "YOLO26n v3",
+      "training_data": "v3, 9,600 images",
+      "precision": 0.8452475896,
+      "recall": 0.6649550706,
+      "map50": 0.7638485026,
+      "map50_95": 0.4998885837
+    },
+    {
+      "model": "YOLO26n v4",
+      "training_data": "v4, 7,575 images",
+      "precision": 0.8481989782,
+      "recall": 0.6223363286,
+      "map50": 0.7106787039,
+      "map50_95": 0.4650258918
+    }
+  ],
+  "v4_minus_v3_percentage_points": {
+    "precision": 0.2951388615,
+    "recall": -4.2618741977,
+    "map50": -5.3169798693,
+    "map50_95": -3.4862691894
+  }
+}
